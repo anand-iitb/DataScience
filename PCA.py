@@ -3,32 +3,36 @@ from sklearn import datasets
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
+
 class MyPCA:
     def __init__(self, n_components):
         self.n_components = n_components
 
     def fit_transform(self, X):
-        """
-        Assumes observations in X are passed as rows of a numpy array.
-        """
+        # Compute the mean of the data
+        self.mean = np.mean(X, axis=0)
+        # Subtract the mean from the data and divide by the standard deviation
+        X_centered = (X - self.mean)/np.std(X, axis=0)
+        # Compute the covariance matrix
+        self.covariance = np.dot(X_centered.T, X_centered) / (X.shape[0] - 1)
+        # Compute the eigenvectors and eigenvalues of the covariance matrix
+        self.eigvals, self.eigvecs = np.linalg.eigh(self.covariance)
+        # Sort the eigenvectors and eigenvalues in descending order of the eigenvalues
+        self.eigvecs = self.eigvecs[:, np.argsort(self.eigvals)[::-1]]
+        self.eigvals = self.eigvals[np.argsort(self.eigvals)[::-1]]
+        # Select the first n_components eigenvectors and eigenvalues
+        self.eigvals = self.eigvals[:self.n_components]
+        self.eigvecs = self.eigvecs[:, :self.n_components]
+        # Return the transformed data
+        return self.transform(X)
 
-        # Translate the dataset so it's centered around 0
-        translated_X = X - np.mean(X, axis=0)
+    def transform(self, X):
+        X_centered = X - self.mean
+        return np.dot(X_centered, self.eigvecs)
 
-        # Calculate the eigenvalues and eigenvectors of the covariance matrix
-        e_values, e_vectors = np.linalg.eigh(np.cov(translated_X.T))
-
-        # Sort eigenvalues and their eigenvectors in descending order
-        e_ind_order = np.flip(e_values.argsort())
-        e_values = e_values[e_ind_order]
-        e_vectors = e_vectors[e_ind_order]
-
-        # Save the first n_components eigenvectors as principal components
-        principal_components = np.take(e_vectors, np.arange(self.n_components), axis=0)
-
-        return np.matmul(translated_X, principal_components.T)
 
 def plot_pca_results(pca_class, dataset, plot_title):
+
     X = dataset.data
     y = dataset.target
     y_names = dataset.target_names
@@ -45,5 +49,4 @@ def plot_pca_results(pca_class, dataset, plot_title):
 
 
 dataset = datasets.load_iris()
-plot_pca_results(MyPCA, dataset, "Iris - my PCA")
-plot_pca_results(PCA, dataset, "Iris - Sklearn")
+plot_pca_results(MyPCA, dataset, "PCA on Iris")
