@@ -1,5 +1,5 @@
 # DataScience
-A Self Learning Project
+A Self Learning Project from Coursera Online course
 
 **PCA (pca.py)**
 Computed Principal Component Analysis on iris dataset using numpy and sklearn library
