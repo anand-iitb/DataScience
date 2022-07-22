@@ -8,4 +8,4 @@ Computed Principal Component Analysis on iris dataset using numpy and sklearn li
 Implemented regularized logistic regression to classify digits using MATLAB
 
 **Spam Filter (svm.m)**
-Used to Support Vector machine for classifying mails into spam and non-spam folders
+This is a spam filter which classifies mails into spam and non-spam by training on Support Vector Machine
